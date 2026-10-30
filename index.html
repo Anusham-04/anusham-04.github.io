@@ -26,7 +26,6 @@
     .profile-wrap { display: flex; flex: 0 0 auto; flex-direction: column; align-items: center; gap: 8px; }
     .profile { display: grid; width: 250px; height: 250px; flex: 0 0 auto; place-items: center; border-radius: 50%; background: linear-gradient(45deg, var(--pink), var(--purple)); animation: float 3s infinite ease-in-out; }
     .circle { display: grid; width: 218px; height: 218px; place-items: center; border-radius: 50%; background: #20113d; font-size: 6rem; overflow: hidden; }
-    .profile-photo { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; }
     @keyframes float { 50% { transform: translateY(-12px); } }
     .btn { display: inline-block; margin-top: 12px; padding: 11px 23px; border: 0; border-radius: 25px; background: linear-gradient(90deg, var(--pink), #7c5cff); color: white; text-decoration: none; cursor: pointer; transition: transform .2s, box-shadow .2s; }
     .btn:hover, .btn:focus { transform: translateY(-2px); box-shadow: 0 0 18px #ff66c477; }
@@ -38,9 +37,6 @@
     .card:hover { transform: translateY(-5px); box-shadow: 0 0 22px #ff66c455; }
     .card h3 { margin-top: 0; color: #f3c2ff; }
     .card p { margin-bottom: 0; color: var(--muted); }
-    .certificate-card .btn { font: inherit; }
-    .certificate-file-name { min-height: 1.6em; overflow-wrap: anywhere; }
-    .storage-note { margin-top: 22px; color: var(--muted); font-size: .9rem; }
     .education-list { max-width: 760px; margin: auto; text-align: left; }
     .education-list .card { margin-bottom: 16px; }
     .contact-links { display: flex; flex-wrap: wrap; justify-content: center; gap: 16px; }
@@ -128,6 +124,12 @@
       <div class="contact-links"><a href="mailto:anushareddy3131@gmail.com">anushareddy3131@gmail.com</a><a href="tel:+916360036778">+91 6360036778</a></div>
       <p class="intro" style="margin-top: 18px;">Bengaluru, Karnataka</p>
     </section>
+    <section id="about"><h2>About Me</h2><p class="intro">I am a BCA student at R R Institute of Management Studies, affiliated with Bangalore University, and expect to graduate in 2027. I enjoy learning programming and working with my classmates on practical projects. I am currently developing an IoT-based smart traffic signal and streetlight management system.</p></section>
+    <section id="skills"><h2>Technical Skills</h2><div class="skills" aria-label="Technical skills"><span class="skill-chip">C</span><span class="skill-chip">Java</span><span class="skill-chip">Python</span></div></section>
+    <section id="project"><h2>Academic Project</h2><div class="card-grid"><article class="card"><h3>IoT Smart Traffic Signals and Streetlight Management System</h3><p><strong>In progress</strong></p><p>The system senses low light at night and switches streetlights on dimly. When a vehicle passes beneath a light, it brightens, then dims again after the vehicle has passed.</p></article></div></section>
+    <section id="education"><h2>Education</h2><div class="education-list"><article class="card"><h3>Bachelor of Computer Applications (BCA)</h3><p>R R Institute of Management Studies, Chikkabanavara, Bengaluru, Karnataka<br>Bangalore University | Expected 2027</p></article><article class="card"><h3>Pre-University Course (PCMB)</h3><p>Vimala Hridaya Pre-University College, T. Gollahalli, Kolar District | 2024</p></article><article class="card"><h3>SSLC</h3><p>St. Teresa Girls High School, Robertsonpet, KGF Taluk, Kolar District, Karnataka | 2022</p></article></div></section>
+    <section id="certifications"><h2>Certifications &amp; Activities</h2><div class="card-grid"><article class="card"><h3>Cloud Computing with AWS</h3><p>EDJUMANTRA ED-TECH SERVICES</p></article><article class="card"><h3>Python</h3><p>ITS</p></article><article class="card"><h3>Industrial Visit</h3><p>Participated in an industrial visit to eMudhra.</p></article></div></section>
+    <section id="contact"><h2>Contact Me</h2><div class="contact-links"><a href="mailto:anushareddy3131@gmail.com">anushareddy3131@gmail.com</a><a href="tel:+916360036778">+91 6360036778</a></div><p class="intro" style="margin-top: 18px;">Bengaluru, Karnataka</p></section>
   </main>
   <footer><p>© 2026 Anusha M | Student Portfolio</p></footer>
   <script>
@@ -138,89 +140,6 @@
       themeBtn.textContent = lightMode ? "🌙" : "☀️";
       themeBtn.setAttribute("aria-label", lightMode ? "Switch to dark mode" : "Switch to light mode");
     });
-    function openCertificateStore() {
-      return new Promise((resolve, reject) => {
-        if (!window.indexedDB) { reject(new Error("This browser does not support local certificate storage.")); return; }
-        const request = indexedDB.open("anusha-portfolio-certificates", 1);
-        request.onupgradeneeded = () => { request.result.createObjectStore("certificates", { keyPath: "id" }); };
-        request.onsuccess = () => resolve(request.result);
-        request.onerror = () => reject(request.error);
-      });
-    }
-    async function readCertificate(id) {
-      const db = await openCertificateStore();
-      return new Promise((resolve, reject) => {
-        const request = db.transaction("certificates", "readonly").objectStore("certificates").get(id);
-        request.onsuccess = () => resolve(request.result);
-        request.onerror = () => reject(request.error);
-      });
-    }
-    async function saveCertificate(record) {
-      const db = await openCertificateStore();
-      return new Promise((resolve, reject) => {
-        const transaction = db.transaction("certificates", "readwrite");
-        transaction.objectStore("certificates").put(record);
-        transaction.oncomplete = () => resolve();
-        transaction.onerror = () => reject(transaction.error);
-      });
-    }
-    document.querySelectorAll(".certificate-card").forEach((card) => {
-      const id = card.dataset.certificateId;
-      const input = card.querySelector(".certificate-input");
-      const button = card.querySelector(".certificate-upload");
-      const fileName = card.querySelector(".certificate-file-name");
-      let certificateUrl = null;
-      function showSavedCertificate(record) {
-        if (certificateUrl) URL.revokeObjectURL(certificateUrl);
-        certificateUrl = URL.createObjectURL(record.file);
-        fileName.textContent = record.name;
-        button.textContent = "Open Certificate";
-        button.setAttribute("aria-label", "Open " + record.name);
-      }
-      button.addEventListener("click", () => {
-        if (certificateUrl) window.open(certificateUrl, "_blank", "noopener");
-        else input.click();
-      });
-      input.addEventListener("change", async () => {
-        const file = input.files[0];
-        if (!file) return;
-        if (file.type !== "application/pdf" && !file.type.startsWith("image/")) {
-          alert("Please choose a PDF or image certificate."); input.value = ""; return;
-        }
-        try { const record = { id, name: file.name, file }; await saveCertificate(record); showSavedCertificate(record); }
-        catch { alert("The certificate could not be saved in this browser. Please try again."); }
-        input.value = "";
-      });
-      readCertificate(id).then((record) => { if (record) showSavedCertificate(record); })
-        .catch(() => { fileName.textContent = "Choose a PDF or image file to add your certificate."; })
-        .finally(() => { button.disabled = false; });
-    });
-    const profilePhotoInput = document.getElementById("profilePhotoInput");
-    const profilePhotoButton = document.getElementById("profilePhotoButton");
-    const profilePhoto = document.getElementById("profilePhoto");
-    const profilePlaceholder = document.getElementById("profilePlaceholder");
-    let profilePhotoUrl = null;
-    function showProfilePhoto(record) {
-      if (profilePhotoUrl) URL.revokeObjectURL(profilePhotoUrl);
-      profilePhotoUrl = URL.createObjectURL(record.file);
-      profilePhoto.src = profilePhotoUrl;
-      profilePhoto.hidden = false;
-      profilePlaceholder.hidden = true;
-      profilePhotoButton.textContent = "Change Photo";
-      profilePhotoButton.setAttribute("aria-label", "Change profile photo");
-    }
-    profilePhotoButton.addEventListener("click", () => profilePhotoInput.click());
-    profilePhotoInput.addEventListener("change", async () => {
-      const file = profilePhotoInput.files[0];
-      if (!file) return;
-      if (!file.type.startsWith("image/")) { alert("Please choose an image file for your profile photo."); profilePhotoInput.value = ""; return; }
-      try { const record = { id: "profile-photo", name: file.name, file }; await saveCertificate(record); showProfilePhoto(record); }
-      catch { alert("Your photo could not be saved in this browser. Please try again."); }
-      profilePhotoInput.value = "";
-    });
-    readCertificate("profile-photo").then((record) => { if (record) showProfilePhoto(record); })
-      .catch(() => { profilePhotoButton.title = "Choose an image from your device"; })
-      .finally(() => { profilePhotoButton.disabled = false; });
   </script>
 </body>
 </html>
